@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Puzzle Prototype — Single File</title>
+<style>
+  /* Basic reset */
+  html,body {
+    height:100%;
+    margin:0;
+    padding:0;
+    font-family: system-ui, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* Force default cursor everywhere (no hand on hover) */
+  * { cursor: default !important; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; }
+
+  /* Fullscreen container using "background" switches */
+  #app {
+    width:100%;
+    height:100vh;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* Use CSS variables to manage backgrounds quickly.
+     For the prototype we use solid colors. Replace with images like:
+     --bg-main: url('assets/bg_main.jpg') center/cover no-repeat;
+  */
+  #app {
+    background: var(--bg, #222);
+    background-size: cover;
+    background-position: center;
+    transition: background 300ms ease;
+  }
+
+  /* Invisible hotspots - position using % and size using % for easy adjusting */
+  .hotspot {
+    position:absolute;
+    background: transparent; /* invisible */
+    border: 0; /* comment out to debug: border:1px dashed rgba(255,255,255,0.25); */
+    /* ensure they capture clicks but show default cursor due to global rule */
+  }
+
+  /* Generic "click-anywhere overlay" for temporary screens */
+  .click-anywhere {
+    position:absolute;
+    inset:0;
+  }
+
+  /* Password overlay */
+  .password-panel {
+    position: absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    min-width:300px;
+    max-width:90%;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display:none;
+    z-index:50;
+    text-align:center;
+    backdrop-filter: blur(4px);
+  }
+  .password-panel input {
+    width:80%;
+    padding:10px 12px;
+    border-radius:6px;
+    border:1px solid rgba(255,255,255,0.2);
+    font-size:16px;
+    outline:none;
+    background: rgba(255,255,255,0.03);
+    color: #fff;
+  }
+  .password-panel button {
+    margin-left:8px;
+    padding:10px 12px;
+    border-radius:6px;
+    border:none;
+    background:#4CAF50;
+    color:#fff;
+    cursor: default; /* cursor forced to default globally; kept for semantics */
+  }
+  .message {
+    margin-top:10px;
+    font-size:14px;
+    color: #ffd;
+  }
+
+  /* Left-side back button (always placed in same spot and visible when relevant) */
+  .back-btn {
+    position:absolute;
+    left:16px;
+    top:16px;
+    z-index:60;
+    padding:8px 12px;
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    border-radius:8px;
+    font-size:14px;
+    display:none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  }
+
+  /* Developer helper (not shown by default) */
+  .dev-note {
+    position:absolute;
+    right:16px;
+    bottom:16px;
+    z-index:70;
+    font-size:12px;
+    color: #fff;
+    background: rgba(0,0,0,0.35);
+    padding:8px;
+    border-radius:6px;
+  }
+
+  /* small responsive tweak */
+  @media (max-width:480px) {
+    .password-panel { min-width: 240px; padding:14px; }
+    .back-btn { font-size:13px; padding:6px 10px; left:10px; top:10px; }
+  }
+
+</style>
+</head>
+<body>
+<div id="app" aria-live="polite">
+  <!-- Back button - shown on screens where you want to return (Scene 2 password and others) -->
+  <div class="back-btn" id="backBtn">⟵ Back</div>
+
+  <!-- Password panel (centered) -->
+  <div class="password-panel" id="passwordPanel" aria-hidden="true">
+    <div style="font-weight:600; margin-bottom:8px;">Enter Password</div>
+    <div>
+      <input id="pwdInput" type="password" placeholder="Password" aria-label="Password input">
+      <button id="pwdSubmit">Submit</button>
+    </div>
+    <div class="message" id="pwdMessage"></div>
+  </div>
+
+  <!-- Click-anywhere overlay for temporary full screen backgrounds -->
+  <div id="tempOverlay" class="click-anywhere" style="display:none"></div>
+
+  <!-- Developer note (visible as comment for you) -->
+  <div class="dev-note" id="devNote" style="display:none">
+    DEV MODE: clickable overlays visible if toggled in code.
+  </div>
+
+  <!-- HOTSPOTS: We'll create named divs for each of the hotspots described.
+       Use % for left/top/width/height to reposition easily in Notepad++.
+       For clarity the IDs map to the scenes and areas: 
+       s1a1, s1a2, s1a3  (scene1 areas)
+       s2a1, s2a2, s2a3, s2a4 (scene2 areas)
+       s3a1, s3a2, s3a3 (scene3 main)
+       s3sub1, s3sub2, s3sub3 (subscene C2)
+       s4a1 (scene4 area)
+  -->
+
+  <!-- Scene 1 hotspots (3) -->
+  <div id="s1a1" class="hotspot" style="left:10%; top:25%; width:20%; height:25%;" title="s1a1"></div>
+  <div id="s1a2" class="hotspot" style="left:65%; top:20%; width:22%; height:28%;" title="s1a2"></div>
+  <div id="s1a3" class="hotspot" style="left:40%; top:62%; width:18%; height:20%;" title="s1a3"></div>
+
+  <!-- Scene 2 hotspots (4) -->
+  <div id="s2a1" class="hotspot" style="left:8%; top:20%; width:20%; height:30%; display:none;" title="s2a1"></div>
+  <div id="s2a2" class="hotspot" style="left:70%; top:18%; width:20%; height:28%; display:none;" title="s2a2"></div>
+  <div id="s2a3" class="hotspot" style="left:10%; top:68%; width:18%; height:18%; display:none;" title="s2a3"></div>
+  <div id="s2a4" class="hotspot" style="left:70%; top:68%; width:18%; height:18%; display:none;" title="s2a4"></div>
+
+  <!-- Scene 3 hotspots (3) -->
+  <div id="s3a1" class="hotspot" style="left:10%; top:18%; width:20%; height:28%; display:none;" title="s3a1"></div>
+  <div id="s3a2" class="hotspot" style="left:40%; top:60%; width:20%; height:22%; display:none;" title="s3a2"></div>
+  <div id="s3a3" class="hotspot" style="left:74%; top:20%; width:18%; height:28%; display:none; opacity:0.0;" title="s3a3"></div>
+
+  <!-- Subscene C2 hotspots (appear when clicking s3a2) -->
+  <div id="s3sub1" class="hotspot" style="left:12%; top:24%; width:18%; height:18%; display:none;" title="s3sub1"></div>
+  <div id="s3sub2" class="hotspot" style="left:40%; top:30%; width:18%; height:18%; display:none;" title="s3sub2"></div>
+  <div id="s3sub3" class="hotspot" style="left:70%; top:28%; width:18%; height:18%; display:none;" title="s3sub3"></div>
+
+  <!-- Scene 4 hotspot (single) -->
+  <div id="s4a1" class="hotspot" style="left:45%; top:50%; width:10%; height:12%; display:none;" title="s4a1"></div>
+
+</div>
+
+<script>
+/* ========= Prototype State & Behavior =========
+   Scenes:
+     scene = 1  -> main hub A
+     scene = 2  -> main hub B
+     scene = 3  -> main hub C
+     scene = 3.2 -> subscene C2 (three clickables)
+     scene = 4  -> final
+   tempOverlay -> used for "click anywhere to return" screens
+   password panel appears while in Scene 2's password area
+   password is 'timeless' (hardcoded)
+*/
+
+(() => {
+  // Configuration (placeholder colors). Replace with background-image: url('...') if you add images.
+  const backgrounds = {
+    scene1: '#1f2937',      // dark slate
+    scene1_a1: '#2d3748',   // scene1 area 1 background
+    scene1_a2: '#2a3b4d',   // scene1 area 2 background
+    scene2: '#3b2f2f',      // scene2 main
+    scene2_a1: '#4a2b4a',
+    scene2_a2: '#4a3b2b',
+    scene2_pass: '#2b3a4a',  // password background
+    scene3: '#263238',
+    scene3_c2: '#2b2626',   // subscene C2
+    scene3_afterC2: '#1b3a2b', // scene3 after sub puzzle completed
+    scene3_a1: '#3a243a',
+    scene3_a_temp: '#25343a',
+    scene4: '#1a1a2b',
+    scene4_a_temp: '#2b1a2b'
+  };
+
+  const password = 'timeless';
+
+  // Track state
+  let state = {
+    scene: 1,
+    // To track temporary 'full-screen' temp mode: object {originScene, originName}
+    tempActive: null,
+    // For subscene C2 clicks
+    subC2Clicked: { s3sub1:false, s3sub2:false, s3sub3:false },
+    // Whether scene3 third area is unlocked
+    scene3Unlocked: false
+  };
+
+  // DOM refs
+  const app = document.getElementById('app');
+  const tempOverlay = document.getElementById('tempOverlay');
+  const passwordPanel = document.getElementById('passwordPanel');
+  const pwdInput = document.getElementById('pwdInput');
+  const pwdSubmit = document.getElementById('pwdSubmit');
+  const pwdMessage = document.getElementById('pwdMessage');
+  const backBtn = document.getElementById('backBtn');
+
+  // Utility: set background
+  function setBackground(key) {
+    // Accept either color or CSS background value
+    const val = backgrounds[key] || key || '#222';
+    app.style.setProperty('--bg', val);
+    app.style.background = val;
+  }
+
+  // Utility: show/hide a set of hotspots
+  function show(ids) {
+    const all = document.querySelectorAll('.hotspot');
+    all.forEach(el => el.style.display = 'none');
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'block';
+    });
+  }
+
+  // Initialize at scene 1
+  function enterScene1() {
+    state.scene = 1;
+    state.tempActive = null;
+    setBackground('scene1');
+    // show 3 hotspots
+    show(['s1a1','s1a2','s1a3']);
+    hidePasswordPanel();
+    hideBackButton();
+  }
+
+  // Scene 1 area actions:
+  function s1a1Action() {
+    // show background A1 and enable click-anywhere to return to scene1
+    setBackground('scene1_a1');
+    openTempOverlay({ originScene:1, originName:'s1' });
+  }
+  function s1a2Action() {
+    setBackground('scene1_a2');
+    openTempOverlay({ originScene:1, originName:'s1' });
+  }
+  function s1a3Action() {
+    // go to scene 2
+    enterScene2();
+  }
+
+  // Scene 2
+  function enterScene2() {
+    state.scene = 2;
+    setBackground('scene2');
+    show(['s2a1','s2a2','s2a3','s2a4']);
+    hidePasswordPanel();
+    hideBackButton();
+  }
+  function s2a1Action() {
+    setBackground('scene2_a1');
+    openTempOverlay({ originScene:2, originName:'s2' });
+  }
+  function s2a2Action() {
+    setBackground('scene2_a2');
+    openTempOverlay({ originScene:2, originName:'s2' });
+  }
+  function s2a3Action() {
+    // return to scene 1
+    enterScene1();
+  }
+  function s2a4Action() {
+    // open password screen (on top of scene2 background)
+    setBackground('scene2_pass');
+    showPasswordPanel();
+    showBackButton(); // back returns to scene2 main
+  }
+
+  // Password handling
+  function showPasswordPanel() {
+    passwordPanel.style.display = 'block';
+    passwordPanel.setAttribute('aria-hidden','false');
+    pwdMessage.textContent = '';
+    pwdInput.value = '';
+    pwdInput.focus();
+  }
+  function hidePasswordPanel() {
+    passwordPanel.style.display = 'none';
+    passwordPanel.setAttribute('aria-hidden','true');
+  }
+  pwdSubmit.addEventListener('click', () => {
+    const val = pwdInput.value.trim();
+    if (val === password) {
+      pwdMessage.style.color = '#bdf7c6';
+      pwdMessage.textContent = 'Unlocked!';
+      hidePasswordPanel();
+      hideBackButton();
+      enterScene3();
+    } else {
+      pwdMessage.style.color = '#ffdddd';
+      pwdMessage.textContent = 'Incorrect password.';
+    }
+  });
+  // Enter Scene 3
+  function enterScene3() {
+    state.scene = 3;
+    setBackground(state.scene3Unlocked ? 'scene3_afterC2' : 'scene3');
+    // show main scene3 hotspots: s3a1, s3a2, s3a3 (s3a3 maybe disabled)
+    // s3a3 visible but disabled if not unlocked (we'll hide it visually but keep it block when unlocked)
+    document.getElementById('s3a1').style.display = 'block';
+    document.getElementById('s3a2').style.display = 'block';
+    if (state.scene3Unlocked) document.getElementById('s3a3').style.display = 'block'; else document.getElementById('s3a3').style.display = 'none';
+    hidePasswordPanel();
+    hideBackButton();
+  }
+  function s3a1Action() {
+    setBackground('scene3_a1');
+    openTempOverlay({ originScene:3, originName:'s3' });
+  }
+  function s3a2Action() {
+    // go to subscene C2
+    enterSubC2();
+  }
+  function s3a3Action() {
+    if (!state.scene3Unlocked) return;
+    // go to scene 4
+    enterScene4();
+  }
+
+  // Subscene C2 (three clickables)
+  function enterSubC2() {
+    state.scene = 3.2;
+    setBackground('scene3_c2');
+    // hide main scene3 hotspots, show sub ones
+    document.getElementById('s3a1').style.display = 'none';
+    document.getElementById('s3a2').style.display = 'none';
+    document.getElementById('s3a3').style.display = 'none';
+    document.getElementById('s3sub1').style.display = 'block';
+    document.getElementById('s3sub2').style.display = 'block';
+    document.getElementById('s3sub3').style.display = 'block';
+    showBackButton(); // back returns to scene3
+    // reset sub clicks if you want fresh each time (keeps state persistent below)
+  }
+  function handleSubClick(id) {
+    state.subC2Clicked[id] = true;
+    // Optionally provide subtle feedback - flash background slightly
+    flashBackground();
+    // hide the clicked hotspot so it's clear it's been pressed
+    document.getElementById(id).style.display = 'none';
+    // if all three clicked -> unlock scene3's 3rd area
+    if (state.subC2Clicked.s3sub1 && state.subC2Clicked.s3sub2 && state.subC2Clicked.s3sub3) {
+      // mark unlocked, return to main scene3 with new background
+      state.scene3Unlocked = true;
+      // hide sub hotspots
+      document.getElementById('s3sub1').style.display = 'none';
+      document.getElementById('s3sub2').style.display = 'none';
+      document.getElementById('s3sub3').style.display = 'none';
+      hideBackButton();
+      // set scene3 background to "afterC2" and show s3a3 now active
+      setBackground('scene3_afterC2');
+      document.getElementById('s3a1').style.display = 'block';
+      document.getElementById('s3a2').style.display = 'block';
+      document.getElementById('s3a3').style.display = 'block';
+      state.scene = 3;
+    }
+  }
+
+  // Scene 4
+  function enterScene4() {
+    state.scene = 4;
+    setBackground('scene4');
+    // show single hotspot s4a1
+    const all = document.querySelectorAll('.hotspot');
+    all.forEach(el => el.style.display = 'none');
+    document.getElementById('s4a1').style.display = 'block';
+    hideBackButton();
+  }
+  function s4a1Action() {
+    // open external link (placeholder example.com)
+    window.open('https://example.com', '_blank', 'noopener');
+  }
+
+  // TEMP overlay functions (click anywhere to return to origin scene)
+  function openTempOverlay(info) {
+    state.tempActive = info;
+    tempOverlay.style.display = 'block';
+    tempOverlay.onclick = () => {
+      tempOverlay.style.display = 'none';
+      tempOverlay.onclick = null;
+      // After clicking temp overlay, return to origin's main scene
+      if (info.originScene === 1) enterScene1();
+      else if (info.originScene === 2) enterScene2();
+      else if (info.originScene === 3) enterScene3();
+      else enterScene1();
+    };
+    // hide all hotspots while temp overlay is active
+    const all = document.querySelectorAll('.hotspot');
+    all.forEach(el => el.style.display = 'none');
+    // leave password panel/back button state unchanged as appropriate
+  }
+
+  // Back button (left) behavior
+  function showBackButton() { backBtn.style.display = 'block'; }
+  function hideBackButton() { backBtn.style.display = 'none'; }
+  backBtn.addEventListener('click', () => {
+    // Behavior: back returns to the appropriate main scene
+    if (state.scene === 3.2) {
+      // going back from subscene c2 to scene3 main
+      enterScene3();
+      // do not reset subC2Clicked — they remain clicked unless you want them to reset
+    } else if (state.scene === 2 || state.scene === 1) {
+      // generic - go back to scene2 main
+      enterScene2();
+    } else {
+      // default: go to scene2
+      enterScene2();
+    }
+  });
+
+  // Small visual flash feedback helper
+  function flashBackground() {
+    const orig = app.style.background;
+    app.style.transition = 'none';
+    app.style.filter = 'brightness(1.1)';
+    setTimeout(()=> {
+      app.style.transition = 'filter 220ms ease';
+      app.style.filter = 'brightness(1)';
+    }, 60);
+  }
+
+  // Attach click handlers for each hotspot by id
+  const hookup = {
+    s1a1: s1a1Action,
+    s1a2: s1a2Action,
+    s1a3: s1a3Action,
+    s2a1: s2a1Action,
+    s2a2: s2a2Action,
+    s2a3: s2a3Action,
+    s2a4: s2a4Action,
+    s3a1: s3a1Action,
+    s3a2: s3a2Action,
+    s3a3: s3a3Action,
+    s3sub1: () => handleSubClick('s3sub1'),
+    s3sub2: () => handleSubClick('s3sub2'),
+    s3sub3: () => handleSubClick('s3sub3'),
+    s4a1: s4a1Action
+  };
+
+  Object.keys(hookup).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const fn = hookup[id];
+      if (typeof fn === 'function') fn();
+    });
+  });
+
+  // Allow pressing Enter in password box to submit
+  pwdInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') { pwdSubmit.click(); }
+  });
+
+  // Initialize
+  enterScene1();
+
+  // Debug helper: press D to toggle dev note borders (uncomment to help place hotspots)
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'd' && e.ctrlKey) {
+      const dev = document.getElementById('devNote');
+      const all = document.querySelectorAll('.hotspot');
+      if (dev.style.display === 'none') {
+        dev.style.display = 'block';
+        all.forEach(h => h.style.border = '1px dashed rgba(255,255,255,0.25)');
+      } else {
+        dev.style.display = 'none';
+        all.forEach(h => h.style.border = '0');
+      }
+    }
+  });
+
+  // Helpful console instructions
+  console.log('Prototype loaded. To tweak hotspot positions, edit the inline styles on each .hotspot element (left/top/width/height).');
+  console.log('Press Ctrl+D to toggle debug outlines for hotspots.');
+})();
+</script>
+</body>
+</html>
