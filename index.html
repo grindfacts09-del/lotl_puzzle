@@ -129,7 +129,8 @@ const sounds = {
   s3sub3: document.getElementById('s3sub3Sound'),
   s4a1: document.getElementById('s4a1Sound')
 };
-  Object.values(sounds).forEach(s=>s.volume=0.2);
+  bgMusic.volume = 0.05;  // very quiet background music
+  Object.values(sounds).forEach(s => s.volume = 0.25); // slightly louder effects
 
   function setBackground(key){ app.style.background = backgrounds[key] || key || '#222'; }
   function showHotspots(ids){ document.querySelectorAll('.hotspot').forEach(h=>h.style.display='none'); ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='block'; }); }
