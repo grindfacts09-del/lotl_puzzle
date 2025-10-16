@@ -65,20 +65,20 @@
 
 <!-- Audio -->
 <audio id="bgMusic" src="assets/bg_music.mp3" loop></audio>
-<audio id="s1a1Sound" src="assets/sounds/s1a1.mp3" preload="auto"></audio>
-<audio id="s1a2Sound" src="assets/sounds/s1a2.mp3" preload="auto"></audio>
-<audio id="s1a3Sound" src="assets/sounds/s1a3.mp3" preload="auto"></audio>
-<audio id="s2a1Sound" src="assets/sounds/s2a1.mp3" preload="auto"></audio>
-<audio id="s2a2Sound" src="assets/sounds/s2a2.mp3" preload="auto"></audio>
-<audio id="s2a3Sound" src="assets/sounds/s2a3.mp3" preload="auto"></audio>
-<audio id="s2a4Sound" src="assets/sounds/s2a4.mp3" preload="auto"></audio>
-<audio id="s3a1Sound" src="assets/sounds/s3a1.mp3" preload="auto"></audio>
-<audio id="s3a2Sound" src="assets/sounds/s3a2.mp3" preload="auto"></audio>
-<audio id="s3a3Sound" src="assets/sounds/s3a3.mp3" preload="auto"></audio>
-<audio id="s3sub1Sound" src="assets/sounds/s3sub1.mp3" preload="auto"></audio>
-<audio id="s3sub2Sound" src="assets/sounds/s3sub2.mp3" preload="auto"></audio>
-<audio id="s3sub3Sound" src="assets/sounds/s3sub3.mp3" preload="auto"></audio>
-<audio id="s4a1Sound" src="assets/sounds/s4a1.mp3" preload="auto"></audio>
+<audio id="s1a1Sound" src="assets/frog.mp3" preload="auto"></audio>
+<audio id="s1a2Sound" src="assets/bird.mp3" preload="auto"></audio>
+<audio id="s1a3Sound" src="assets/open.mp3" preload="auto"></audio>
+<audio id="s2a1Sound" src="assets/stone.mp3" preload="auto"></audio>
+<audio id="s2a2Sound" src="assets/drawer.mp3" preload="auto"></audio>
+<audio id="s2a3Sound" src="assets/open.mp3" preload="auto"></audio>
+<audio id="s2a4Sound" src="assets/open.mp3" preload="auto"></audio>
+<audio id="s3a1Sound" src="assets/paper.mp3" preload="auto"></audio>
+<audio id="s3a2Sound" src="assets/open.mp3" preload="auto"></audio>
+<audio id="s3a3Sound" src="assets/paper.mp3" preload="auto"></audio>
+<audio id="s3sub1Sound" src="assets/eating.mp3" preload="auto"></audio>
+<audio id="s3sub2Sound" src="assets/eating.mp3" preload="auto"></audio>
+<audio id="s3sub3Sound" src="assets/eating.mp3" preload="auto"></audio>
+<audio id="s4a1Sound" src="assets/open.mp3" preload="auto"></audio>
 
 <script>
 (() => {
@@ -112,23 +112,23 @@
   const backBtn = document.getElementById('backBtn');
 
   // --- Audio elements ---
-  const bgMusic = document.getElementById('assets/bg_music.mp3'); bgMusic.volume=0.2;
-  const sounds = {
-    s1a1: document.getElementById('assets/frog.mp3'),
-    s1a2: document.getElementById('assets/bird.mp3'),
-    s1a3: document.getElementById('assets/open.mp3'),
-    s2a1: document.getElementById('assets/stone.mp3'),
-    s2a2: document.getElementById('assets/drawer.mp3'),
-    s2a3: document.getElementById('assets/open.mp3'),
-    s2a4: document.getElementById('assets/open.mp3'),
-    s3a1: document.getElementById('assets/paper.mp3'),
-    s3a2: document.getElementById('assets/open.mp3'),
-    s3a3: document.getElementById('assets/paper.mp3'),
-    s3sub1: document.getElementById('assets/eating.mp3'),
-    s3sub2: document.getElementById('assets/eating.mp3'),
-    s3sub3: document.getElementById('assets/eating.mp3'),
-    s4a1: document.getElementById('assets/open.mp3')
-  };
+const bgMusic = document.getElementById('bgMusic'); 
+const sounds = {
+  s1a1: document.getElementById('s1a1Sound'),
+  s1a2: document.getElementById('s1a2Sound'),
+  s1a3: document.getElementById('s1a3Sound'),
+  s2a1: document.getElementById('s2a1Sound'),
+  s2a2: document.getElementById('s2a2Sound'),
+  s2a3: document.getElementById('s2a3Sound'),
+  s2a4: document.getElementById('s2a4Sound'),
+  s3a1: document.getElementById('s3a1Sound'),
+  s3a2: document.getElementById('s3a2Sound'),
+  s3a3: document.getElementById('s3a3Sound'),
+  s3sub1: document.getElementById('s3sub1Sound'),
+  s3sub2: document.getElementById('s3sub2Sound'),
+  s3sub3: document.getElementById('s3sub3Sound'),
+  s4a1: document.getElementById('s4a1Sound')
+};
   Object.values(sounds).forEach(s=>s.volume=0.2);
 
   function setBackground(key){ app.style.background = backgrounds[key] || key || '#222'; }
