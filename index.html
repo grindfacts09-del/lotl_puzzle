@@ -195,7 +195,9 @@ const sounds = {
 
   window.addEventListener('keydown', (e) => { if(e.key==='d' && e.ctrlKey){ const dev = document.getElementById('devNote'); const all = document.querySelectorAll('.hotspot'); if(dev.style.display==='none'){ dev.style.display='block'; all.forEach(h=>h.style.border='1px dashed rgba(255,255,255,0.25)'); } else { dev.style.display='none'; all.forEach(h=>h.style.border='0'); } } });
   
-  function startMusic(){ bgMusic.play().catch(err=>{ console.log('Music autoplay blocked until user interacts.'); }); window.removeEventListener('click', startMusic); }
+  function startMusic(){ 
+  bgMusic.volume = 0.05; 
+  bgMusic.play().catch(err=>{ console.log('Music autoplay blocked until user interacts.'); }); window.removeEventListener('click', startMusic); }
   window.addEventListener('click', startMusic);
 
   enterScene1();
