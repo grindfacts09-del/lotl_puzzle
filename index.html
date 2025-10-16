@@ -6,166 +6,35 @@
 <title>Puzzle Prototype — Single File</title>
 <style>
   /* Basic reset */
-  html,body {
-    height:100%;
-    margin:0;
-    padding:0;
-    font-family: system-ui, Arial, sans-serif;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-  }
-
-  /* Force default cursor everywhere (no hand on hover) */
+  html,body { height:100%; margin:0; padding:0; font-family: system-ui, Arial, sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   * { cursor: default !important; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; }
 
-  /* Fullscreen container using "background" switches */
-  #app {
-    width:100%;
-    height:100vh;
-    position:relative;
-    overflow:hidden;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+  #app { width:100%; height:100vh; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; background: var(--bg, #222); background-size: cover; background-position: center; transition: background 300ms ease; }
+  .hotspot { position:absolute; background: transparent; border: 0; }
+  .click-anywhere { position:absolute; inset:0; }
+
+  .password-panel {
+    position: absolute; left:50%; top:50%; transform: translate(-50%, -50%);
+    min-width:300px; max-width:90%; background:#f4e1b0; color:#4b2e0f; padding:20px;
+    border-radius:8px; border:3px solid #c9a66b; box-shadow:5px 8px 20px rgba(0,0,0,0.4);
+    display:none; z-index:50; text-align:center; font-family:'Georgia', serif; line-height:1.4;
+    background-image: linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%),
+                      linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%);
+    background-size:40px 40px;
   }
+  .password-panel input { width:80%; padding:10px 12px; border-radius:4px; border:2px solid #b8965a; font-size:16px; outline:none; background:#fff8e1; color:#4b2e0f; box-shadow: inset 1px 1px 4px rgba(0,0,0,0.2); font-family:'Georgia', serif; display:inline-block; vertical-align:middle; }
+  .password-panel button { margin-left:8px; padding:10px 12px; border-radius:4px; border:2px solid #b8965a; background:#c9a66b; color:#4b2e0f; cursor:default; font-family:'Georgia', serif; box-shadow:2px 2px 5px rgba(0,0,0,0.3); display:inline-block; vertical-align:middle; }
+  .password-panel .message { margin-top:12px; font-size:14px; color:#000000; font-family:'Georgia', serif; display:block; text-shadow:1px 1px 2px rgba(255,255,255,0.4); }
 
-  /* Use CSS variables to manage backgrounds quickly.
-     For the prototype we use solid colors. Replace with images like:
-     --bg-main: url('assets/bg_main.jpg') center/cover no-repeat;
-  */
-  #app {
-    background: var(--bg, #222);
-    background-size: cover;
-    background-position: center;
-    transition: background 300ms ease;
-  }
+  .back-btn { position:absolute; left:16px; top:16px; z-index:60; padding:8px 12px; background:#f4e1b0; color:#4b2e0f; border-radius:6px; font-size:14px; display:none; box-shadow:2px 2px 8px rgba(0,0,0,0.3); border:2px solid #c9a66b; font-family:'Georgia', serif; cursor:default; }
+  .dev-note { position:absolute; right:16px; bottom:16px; z-index:70; font-size:12px; color:#fff; background: rgba(0,0,0,0.35); padding:8px; border-radius:6px; }
 
-  /* Invisible hotspots - position using % and size using % for easy adjusting */
-  .hotspot {
-    position:absolute;
-    background: transparent; /* invisible */
-    border: 0; /* comment out to debug: border:1px dashed rgba(255,255,255,0.25); */
-    /* ensure they capture clicks but show default cursor due to global rule */
-  }
-
-  /* Generic "click-anywhere overlay" for temporary screens */
-  .click-anywhere {
-    position:absolute;
-    inset:0;
-  }
-
-/* Rustic Password Overlay */
-.password-panel {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  min-width: 300px;
-  max-width: 90%;
-  background: #f4e1b0; /* aged parchment yellow */
-  color: #4b2e0f; /* dark brown text */
-  padding: 20px;
-  border-radius: 8px;
-  border: 3px solid #c9a66b; /* rough frame color */
-  box-shadow: 5px 8px 20px rgba(0,0,0,0.4);
-  display: none;
-  z-index: 50;
-  text-align: center;
-  font-family: 'Georgia', serif;
-  line-height: 1.4;
-  /* subtle paper texture effect */
-  background-image: linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%),
-                    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%);
-  background-size: 40px 40px;
-}
-
-/* Input inside panel */
-.password-panel input {
-  width: 80%;
-  padding: 10px 12px;
-  border-radius: 4px;
-  border: 2px solid #b8965a;
-  font-size: 16px;
-  outline: none;
-  background: #fff8e1;
-  color: #4b2e0f;
-  box-shadow: inset 1px 1px 4px rgba(0,0,0,0.2);
-  font-family: 'Georgia', serif;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-/* Button inside panel */
-.password-panel button {
-  margin-left: 8px;
-  padding: 10px 12px;
-  border-radius: 4px;
-  border: 2px solid #b8965a;
-  background: #c9a66b;
-  color: #4b2e0f;
-  cursor: default;
-  font-family: 'Georgia', serif;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-  display: inline-block;
-  vertical-align: middle;
-}
-
-/* Message text */
-.password-panel .message {
-  margin-top: 12px;
-  font-size: 14px;
-  color: #000000;
-  font-family: 'Georgia', serif;
-  display: block;
-  text-shadow: 1px 1px 2px rgba(255,255,255,0.4); /* soft glow for readability */
-}
-
-
- /* Left-side back button */
-.back-btn {
-  position: absolute;
-  left: 16px;
-  top: 16px;
-  z-index: 60;
-  padding: 8px 12px;
-  background: #f4e1b0; /* aged paper yellow */
-  color: #4b2e0f; /* dark brown text */
-  border-radius: 6px;
-  font-size: 14px;
-  display: none;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-  border: 2px solid #c9a66b; /* subtle rustic frame */
-  font-family: 'Georgia', serif;
-  cursor: default; /* keep consistent with password panel */
-}
-
-  /* Developer helper (not shown by default) */
-  .dev-note {
-    position:absolute;
-    right:16px;
-    bottom:16px;
-    z-index:70;
-    font-size:12px;
-    color: #fff;
-    background: rgba(0,0,0,0.35);
-    padding:8px;
-    border-radius:6px;
-  }
-
-  /* small responsive tweak */
-  @media (max-width:480px) {
-    .password-panel { min-width: 240px; padding:14px; }
-    .back-btn { font-size:13px; padding:6px 10px; left:10px; top:10px; }
-  }
-
+  @media (max-width:480px) { .password-panel { min-width:240px; padding:14px; } .back-btn { font-size:13px; padding:6px 10px; left:10px; top:10px; } }
 </style>
 </head>
 <body>
 <div id="app" aria-live="polite">
-  <!-- Back button - shown on screens where you want to return (Scene 2 password and others) -->
   <div class="back-btn" id="backBtn">⟵ Back</div>
-
-  <!-- Password panel (centered) -->
   <div class="password-panel" id="passwordPanel" aria-hidden="true">
     <div style="font-weight:600; margin-bottom:8px;">Enter Password</div>
     <div>
@@ -174,52 +43,43 @@
     </div>
     <div class="message" id="pwdMessage"></div>
   </div>
-	
-  <!-- Click-anywhere overlay for temporary full screen backgrounds -->
   <div id="tempOverlay" class="click-anywhere" style="display:none"></div>
+  <div class="dev-note" id="devNote" style="display:none">DEV MODE: clickable overlays visible if toggled in code.</div>
 
-  <!-- Developer note (visible as comment for you) -->
-  <div class="dev-note" id="devNote" style="display:none">
-    DEV MODE: clickable overlays visible if toggled in code.
-  </div>
-
-  <!-- HOTSPOTS: We'll create named divs for each of the hotspots described.
-       Use % for left/top/width/height to reposition easily in Notepad++.
-       For clarity the IDs map to the scenes and areas: 
-       s1a1, s1a2, s1a3  (scene1 areas)
-       s2a1, s2a2, s2a3, s2a4 (scene2 areas)
-       s3a1, s3a2, s3a3 (scene3 main)
-       s3sub1, s3sub2, s3sub3 (subscene C2)
-       s4a1 (scene4 area)
-  -->
-
-  <!-- Scene 1 hotspots (3) -->
-  <div id="s1a1" class="hotspot" style="left:15%; top:80%; width:10%; height:15%;" title="s1a1"></div>
-  <div id="s1a2" class="hotspot" style="left:85%; top:35%; width:10%; height:15%;" title="s1a2"></div>
-  <div id="s1a3" class="hotspot" style="left:30%; top:35%; width:15%; height:20%;" title="s1a3"></div>
-
-  <!-- Scene 2 hotspots (4) -->
-  <div id="s2a1" class="hotspot" style="left:8%; top:70%; width:15%; height:15%; display:none;" title="s2a1"></div>
-  <div id="s2a2" class="hotspot" style="left:85%; top:75%; width:10%; height:15%; display:none;" title="s2a2"></div>
-  <div id="s2a3" class="hotspot" style="left:40%; top:70%; width:12%; height:25%; display:none;" title="s2a3"></div>
-  <div id="s2a4" class="hotspot" style="left:35%; top:45%; width:23%; height:15%; display:none;" title="s2a4"></div>
-
-  <!-- Scene 3 hotspots (3) -->
-  <div id="s3a1" class="hotspot" style="left:61%; top:67%; width:10%; height:12%; display:none;" title="s3a1"></div>
-  <div id="s3a2" class="hotspot" style="left:45%; top:75%; width:15%; height:15%; display:none;" title="s3a2"></div>
-  <div id="s3a3" class="hotspot" style="left:53%; top:20%; width:13%; height:28%; display:none; opacity:0.0;" title="s3a3"></div>
-
-  <!-- Subscene C2 hotspots (appear when clicking s3a2) -->
-  <div id="s3sub1" class="hotspot" style="left:27%; top:12%; width:20%; height:15%; display:none;" title="s3sub1"></div>
-  <div id="s3sub2" class="hotspot" style="left:47%; top:75%; width:20%; height:20%; display:none;" title="s3sub2"></div>
-  <div id="s3sub3" class="hotspot" style="left:67%; top:55%; width:10%; height:15%; display:none;" title="s3sub3"></div>
-
-  <!-- Scene 4 hotspot (single) -->
-  <div id="s4a1" class="hotspot" style="left:60%; top:60%; width:17%; height:14%; display:none;" title="s4a1"></div>
-
+  <!-- Hotspots -->
+  <div id="s1a1" class="hotspot" style="left:15%; top:80%; width:10%; height:15%;"></div>
+  <div id="s1a2" class="hotspot" style="left:85%; top:35%; width:10%; height:15%;"></div>
+  <div id="s1a3" class="hotspot" style="left:30%; top:35%; width:15%; height:20%;"></div>
+  <div id="s2a1" class="hotspot" style="left:8%; top:70%; width:15%; height:15%; display:none;"></div>
+  <div id="s2a2" class="hotspot" style="left:85%; top:75%; width:10%; height:15%; display:none;"></div>
+  <div id="s2a3" class="hotspot" style="left:40%; top:70%; width:12%; height:25%; display:none;"></div>
+  <div id="s2a4" class="hotspot" style="left:35%; top:45%; width:23%; height:15%; display:none;"></div>
+  <div id="s3a1" class="hotspot" style="left:61%; top:67%; width:10%; height:12%; display:none;"></div>
+  <div id="s3a2" class="hotspot" style="left:45%; top:75%; width:15%; height:15%; display:none;"></div>
+  <div id="s3a3" class="hotspot" style="left:53%; top:20%; width:13%; height:28%; display:none; opacity:0.0;"></div>
+  <div id="s3sub1" class="hotspot" style="left:27%; top:12%; width:20%; height:15%; display:none;"></div>
+  <div id="s3sub2" class="hotspot" style="left:47%; top:75%; width:20%; height:20%; display:none;"></div>
+  <div id="s3sub3" class="hotspot" style="left:67%; top:55%; width:10%; height:15%; display:none;"></div>
+  <div id="s4a1" class="hotspot" style="left:60%; top:60%; width:17%; height:14%; display:none;"></div>
 </div>
 
+<!-- Audio -->
 <audio id="bgMusic" src="assets/bg_music.mp3" loop></audio>
+<audio id="s1a1Sound" src="assets/sounds/s1a1.mp3" preload="auto"></audio>
+<audio id="s1a2Sound" src="assets/sounds/s1a2.mp3" preload="auto"></audio>
+<audio id="s1a3Sound" src="assets/sounds/s1a3.mp3" preload="auto"></audio>
+<audio id="s2a1Sound" src="assets/sounds/s2a1.mp3" preload="auto"></audio>
+<audio id="s2a2Sound" src="assets/sounds/s2a2.mp3" preload="auto"></audio>
+<audio id="s2a3Sound" src="assets/sounds/s2a3.mp3" preload="auto"></audio>
+<audio id="s2a4Sound" src="assets/sounds/s2a4.mp3" preload="auto"></audio>
+<audio id="s3a1Sound" src="assets/sounds/s3a1.mp3" preload="auto"></audio>
+<audio id="s3a2Sound" src="assets/sounds/s3a2.mp3" preload="auto"></audio>
+<audio id="s3a3Sound" src="assets/sounds/s3a3.mp3" preload="auto"></audio>
+<audio id="s3sub1Sound" src="assets/sounds/s3sub1.mp3" preload="auto"></audio>
+<audio id="s3sub2Sound" src="assets/sounds/s3sub2.mp3" preload="auto"></audio>
+<audio id="s3sub3Sound" src="assets/sounds/s3sub3.mp3" preload="auto"></audio>
+<audio id="s4a1Sound" src="assets/sounds/s4a1.mp3" preload="auto"></audio>
+
 <script>
 (() => {
   // --- Backgrounds ---
@@ -230,7 +90,7 @@
     scene2: "url('assets/second_scene.png') center/cover no-repeat",
     scene2_a1: "url('assets/stone_scene.png') center/cover no-repeat",
     scene2_a2: "url('assets/table_scene.jpg') center/cover no-repeat",
-    scene2_pass: "url('assets/door_scene.png') center/cover no-repeat",
+    scene2_pass: "url('assets/door_scene1.png') center/cover no-repeat",
     scene3: "url('assets/closed_scene.jpg') center/cover no-repeat",
     scene3_c2: "url('assets/plate_scene.jpg') center/cover no-repeat",
     scene3_afterC2: "url('assets/third_scene.jpg') center/cover no-repeat",
@@ -241,12 +101,7 @@
   const password = 'timeless';
 
   // --- State ---
-  let state = {
-    scene:1,
-    tempActive:null,
-    subC2Clicked:{s3sub1:false,s3sub2:false,s3sub3:false},
-    scene3Unlocked:false
-  };
+  let state = { scene:1, tempActive:null, subC2Clicked:{s3sub1:false,s3sub2:false,s3sub3:false}, scene3Unlocked:false };
 
   const app = document.getElementById('app');
   const tempOverlay = document.getElementById('tempOverlay');
@@ -256,128 +111,75 @@
   const pwdMessage = document.getElementById('pwdMessage');
   const backBtn = document.getElementById('backBtn');
 
-  function setBackground(key){ app.style.background = backgrounds[key] || key || '#222'; }
+  // --- Audio elements ---
+  const bgMusic = document.getElementById('assets/bg_music.mp3'); bgMusic.volume=0.2;
+  const sounds = {
+    s1a1: document.getElementById('assets/frog.mp3'),
+    s1a2: document.getElementById('assets/bird.mp3'),
+    s1a3: document.getElementById('assets/open.mp3'),
+    s2a1: document.getElementById('assets/stone.mp3'),
+    s2a2: document.getElementById('assets/drawer.mp3'),
+    s2a3: document.getElementById('assets/open.mp3'),
+    s2a4: document.getElementById('assets/open.mp3'),
+    s3a1: document.getElementById('assets/paper.mp3'),
+    s3a2: document.getElementById('assets/open.mp3'),
+    s3a3: document.getElementById('assets/paper.mp3'),
+    s3sub1: document.getElementById('assets/eating.mp3'),
+    s3sub2: document.getElementById('assets/eating.mp3'),
+    s3sub3: document.getElementById('assets/eating.mp3'),
+    s4a1: document.getElementById('assets/open.mp3')
+  };
+  Object.values(sounds).forEach(s=>s.volume=0.2);
 
-  function showHotspots(ids){
-    const all = document.querySelectorAll('.hotspot');
-    all.forEach(h=>h.style.display='none');
-    ids.forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.style.display='block';
-    });
-  }
+  function setBackground(key){ app.style.background = backgrounds[key] || key || '#222'; }
+  function showHotspots(ids){ document.querySelectorAll('.hotspot').forEach(h=>h.style.display='none'); ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='block'; }); }
 
   // --- Scenes ---
-  function enterScene1(){
-    state.scene=1;
-    state.tempActive=null;
-    setBackground('scene1');
-    showHotspots(['s1a1','s1a2','s1a3']);
-    hidePasswordPanel(); hideBackButton();
-  }
-  function s1a1Action(){ openTemp('scene1_a1',1); }
-  function s1a2Action(){ openTemp('scene1_a2',1); }
-  function s1a3Action(){ enterScene2(); }
+  function enterScene1(){ state.scene=1; state.tempActive=null; setBackground('scene1'); showHotspots(['s1a1','s1a2','s1a3']); hidePasswordPanel(); hideBackButton(); }
+  function s1a1Action(){ playSound('s1a1'); openTemp('scene1_a1',1); }
+  function s1a2Action(){ playSound('s1a2'); openTemp('scene1_a2',1); }
+  function s1a3Action(){ playSound('s1a3'); enterScene2(); }
 
-  function enterScene2(){
-    state.scene=2;
-    setBackground('scene2');
-    showHotspots(['s2a1','s2a2','s2a3','s2a4']);
-    hidePasswordPanel(); hideBackButton();
-  }
-  function s2a1Action(){ openTemp('scene2_a1',2); }
-  function s2a2Action(){ openTemp('scene2_a2',2); }
-  function s2a3Action(){ enterScene1(); }
-  function s2a4Action(){
-    state.scene = '2_pass';  // new distinct state
-    showPasswordScreen();}
+  function enterScene2(){ state.scene=2; setBackground('scene2'); showHotspots(['s2a1','s2a2','s2a3','s2a4']); hidePasswordPanel(); hideBackButton(); }
+  function s2a1Action(){ playSound('s2a1'); openTemp('scene2_a1',2); }
+  function s2a2Action(){ playSound('s2a2'); openTemp('scene2_a2',2); }
+  function s2a3Action(){ playSound('s2a3'); enterScene1(); }
+  function s2a4Action(){ playSound('s2a4'); state.scene = '2_pass'; showPasswordScreen(); }
 
-  function showPasswordScreen(){
-    setBackground('scene2_pass');
-    showPasswordPanel(); showBackButton();
-    showHotspots([]); // hide s2 hotspots while entering password
-  }
+  function showPasswordScreen(){ setBackground('scene2_pass'); showPasswordPanel(); showBackButton(); showHotspots([]); }
   function showPasswordPanel(){ passwordPanel.style.display='block'; passwordPanel.setAttribute('aria-hidden','false'); pwdMessage.textContent=''; pwdInput.value=''; pwdInput.focus();}
   function hidePasswordPanel(){ passwordPanel.style.display='none'; passwordPanel.setAttribute('aria-hidden','true'); }
 
   pwdSubmit.addEventListener('click',()=>{
-    if(pwdInput.value.trim()===password){
-      pwdMessage.style.color='#bdf7c6';
-      pwdMessage.textContent='Unlocked!';
-      hidePasswordPanel(); hideBackButton();
-      enterScene3();
-    } else { pwdMessage.style.color='#4b2e0f'; pwdMessage.textContent='Incorrect password.'; }
+    if(pwdInput.value.trim()===password){ pwdMessage.style.color='#bdf7c6'; pwdMessage.textContent='Unlocked!'; hidePasswordPanel(); hideBackButton(); enterScene3(); } 
+    else { pwdMessage.style.color='#4b2e0f'; pwdMessage.textContent='Incorrect password.'; }
   });
   pwdInput.addEventListener('keypress',e=>{ if(e.key==='Enter'){pwdSubmit.click();} });
 
-  function enterScene3(){
-    state.scene=3;
-    setBackground(state.scene3Unlocked?'scene3_afterC2':'scene3');
-    showHotspots(['s3a1','s3a2'].concat(state.scene3Unlocked?['s3a3']:[]));
-    hidePasswordPanel(); hideBackButton();
-  }
-  function s3a1Action(){ openTemp('scene3_a1',3); }
-  function s3a2Action(){ enterSubC2(); }
-  function s3a3Action(){ if(state.scene3Unlocked) enterScene4(); }
+  function enterScene3(){ state.scene=3; setBackground(state.scene3Unlocked?'scene3_afterC2':'scene3'); showHotspots(['s3a1','s3a2'].concat(state.scene3Unlocked?['s3a3']:[])); hidePasswordPanel(); hideBackButton(); }
+  function s3a1Action(){ playSound('s3a1'); openTemp('scene3_a1',3); }
+  function s3a2Action(){ playSound('s3a2'); enterSubC2(); }
+  function s3a3Action(){ if(state.scene3Unlocked){ playSound('s3a3'); enterScene4(); } }
 
-  function enterSubC2(){
-    state.scene=3.2;
-    setBackground('scene3_c2');
-    showHotspots(['s3sub1','s3sub2','s3sub3']);
-    showBackButton();
-    // reset subscene click state if needed
-    state.subC2Clicked={s3sub1:false,s3sub2:false,s3sub3:false};
-  }
-  function handleSubClick(id){
-    state.subC2Clicked[id]=true;
-    document.getElementById(id).style.display='none';
-    flash();
-    if(state.subC2Clicked.s3sub1 && state.subC2Clicked.s3sub2 && state.subC2Clicked.s3sub3){
-      state.scene3Unlocked=true;
-      enterScene3();
-    }
-  }
+  function enterSubC2(){ state.scene=3.2; setBackground('scene3_c2'); showHotspots(['s3sub1','s3sub2','s3sub3']); showBackButton(); state.subC2Clicked={s3sub1:false,s3sub2:false,s3sub3:false}; }
+  function handleSubClick(id){ playSound(id); state.subC2Clicked[id]=true; document.getElementById(id).style.display='none'; flash(); if(state.subC2Clicked.s3sub1 && state.subC2Clicked.s3sub2 && state.subC2Clicked.s3sub3){ state.scene3Unlocked=true; enterScene3(); } }
 
-  function enterScene4(){
-    state.scene=4;
-    setBackground('scene4');
-    showHotspots(['s4a1']);
-    hideBackButton();
-  }
-  function s4a1Action(){ window.open('https://docs.google.com/forms/d/e/1FAIpQLScC6asogSAyfWz5jQbuOZuWM2QVhCg1lNtt-YERSxLf5HSVnQ/viewform?usp=dialog','_blank','noopener'); }
+  function enterScene4(){ state.scene=4; setBackground('scene4'); showHotspots(['s4a1']); hideBackButton(); }
+  function s4a1Action(){ playSound('s4a1'); window.open('https://docs.google.com/forms/d/e/1FAIpQLScC6asogSAyfWz5jQbuOZuWM2QVhCg1lNtt-YERSxLf5HSVnQ/viewform?usp=dialog','_blank','noopener'); }
 
-  function openTemp(bg,originScene){
-    state.tempActive={originScene};
-    setBackground(bg);
-    showHotspots([]);
-    tempOverlay.style.display='block';
-    tempOverlay.onclick=()=>{
-      tempOverlay.style.display='none';
-      state.tempActive=null;
-      if(originScene===1) enterScene1();
-      else if(originScene===2) enterScene2();
-      else enterScene3();
-    };
-  }
-
-  function showBackButton(){ backBtn.style.display='block'; }
-  function hideBackButton(){ backBtn.style.display='none'; }
+  function openTemp(bg,originScene){ state.tempActive={originScene}; setBackground(bg); showHotspots([]); tempOverlay.style.display='block'; tempOverlay.onclick=()=>{ tempOverlay.style.display='none'; state.tempActive=null; if(originScene===1) enterScene1(); else if(originScene===2) enterScene2(); else enterScene3(); }; }
+  function showBackButton(){ backBtn.style.display='block'; } function hideBackButton(){ backBtn.style.display='none'; }
 
   backBtn.addEventListener('click', ()=>{
-    if(state.scene === 3.2) {
-        // From subscene C2 back to main scene 3
-        enterScene3();
-    } else if(state.scene === '2_pass') {
-        // From password panel back to scene 2
-        enterScene2();
-    } else if(state.scene === 2 || state.scene === 1) {
-        enterScene2();
-    } else {
-        enterScene2();
-    }
-});
+    if(state.scene === 3.2){ enterScene3(); }
+    else if(state.scene === '2_pass'){ enterScene2(); }
+    else if(state.scene === 2 || state.scene === 1){ enterScene2(); }
+    else { enterScene2(); }
+  });
 
   function flash(){ app.style.transition='none'; app.style.filter='brightness(1.1)'; setTimeout(()=>{app.style.transition='filter 220ms ease'; app.style.filter='brightness(1)';},60); }
+
+  function playSound(id){ if(sounds[id]){ sounds[id].currentTime=0; sounds[id].play().catch(()=>{}); } }
 
   const hookup = {
     s1a1:s1a1Action,s1a2:s1a2Action,s1a3:s1a3Action,
@@ -390,38 +192,14 @@
   };
   Object.keys(hookup).forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); hookup[id](); }); });
 
-  // Dev Mode toggle Ctrl+D
-  window.addEventListener('keydown', (e) => {
-    if(e.key==='d' && e.ctrlKey){
-      const dev = document.getElementById('devNote');
-      const all = document.querySelectorAll('.hotspot');
-      if(dev.style.display==='none'){
-        dev.style.display='block';
-        all.forEach(h=>h.style.border='1px dashed rgba(255,255,255,0.25)');
-      } else {
-        dev.style.display='none';
-        all.forEach(h=>h.style.border='0');
-      }
-    }
-  });
+  window.addEventListener('keydown', (e) => { if(e.key==='d' && e.ctrlKey){ const dev = document.getElementById('devNote'); const all = document.querySelectorAll('.hotspot'); if(dev.style.display==='none'){ dev.style.display='block'; all.forEach(h=>h.style.border='1px dashed rgba(255,255,255,0.25)'); } else { dev.style.display='none'; all.forEach(h=>h.style.border='0'); } } });
   
-  const bgMusic = document.getElementById('bgMusic');
+  function startMusic(){ bgMusic.play().catch(err=>{ console.log('Music autoplay blocked until user interacts.'); }); window.removeEventListener('click', startMusic); }
+  window.addEventListener('click', startMusic);
 
-// Start music on first user interaction (required for autoplay in browsers)
-function startMusic() {
-  bgMusic.play().catch(err => {
-    console.log('Music autoplay blocked until user interacts.');
-  });
-  window.removeEventListener('click', startMusic);
-}
-window.addEventListener('click', startMusic);
-
-
-  // Init
   enterScene1();
   document.querySelectorAll('.hotspot').forEach(el => el.removeAttribute('title'));
 })();
 </script>
 </body>
 </html>
-
