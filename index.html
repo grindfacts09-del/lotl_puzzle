@@ -1,208 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Puzzle Prototype — Single File</title>
-<style>
-  /* Basic reset */
-  html,body { height:100%; margin:0; padding:0; font-family: system-ui, Arial, sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-  * { cursor: default !important; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Landing Page</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the Inter font and smooth transitions */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
 
-  #app { width:100%; height:100vh; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; background: var(--bg, #222); background-size: cover; background-position: center; transition: background 300ms ease; }
-  .hotspot { position:absolute; background: transparent; border: 0; }
-  .click-anywhere { position:absolute; inset:0; }
-
-  .password-panel {
-    position: absolute; left:50%; top:50%; transform: translate(-50%, -50%);
-    min-width:300px; max-width:90%; background:#f4e1b0; color:#4b2e0f; padding:20px;
-    border-radius:8px; border:3px solid #c9a66b; box-shadow:5px 8px 20px rgba(0,0,0,0.4);
-    display:none; z-index:50; text-align:center; font-family:'Georgia', serif; line-height:1.4;
-    background-image: linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%),
-                      linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%);
-    background-size:40px 40px;
-  }
-  .password-panel input { width:80%; padding:10px 12px; border-radius:4px; border:2px solid #b8965a; font-size:16px; outline:none; background:#fff8e1; color:#4b2e0f; box-shadow: inset 1px 1px 4px rgba(0,0,0,0.2); font-family:'Georgia', serif; display:inline-block; vertical-align:middle; }
-  .password-panel button { margin-left:8px; padding:10px 12px; border-radius:4px; border:2px solid #b8965a; background:#c9a66b; color:#4b2e0f; cursor:default; font-family:'Georgia', serif; box-shadow:2px 2px 5px rgba(0,0,0,0.3); display:inline-block; vertical-align:middle; }
-  .password-panel .message { margin-top:12px; font-size:14px; color:#000000; font-family:'Georgia', serif; display:block; text-shadow:1px 1px 2px rgba(255,255,255,0.4); }
-
-  .back-btn { position:absolute; left:16px; top:16px; z-index:60; padding:8px 12px; background:#f4e1b0; color:#4b2e0f; border-radius:6px; font-size:14px; display:none; box-shadow:2px 2px 8px rgba(0,0,0,0.3); border:2px solid #c9a66b; font-family:'Georgia', serif; cursor:default; }
-  .dev-note { position:absolute; right:16px; bottom:16px; z-index:70; font-size:12px; color:#fff; background: rgba(0,0,0,0.35); padding:8px; border-radius:6px; }
-
-  @media (max-width:480px) { .password-panel { min-width:240px; padding:14px; } .back-btn { font-size:13px; padding:6px 10px; left:10px; top:10px; } }
-</style>
+        /* Ensure the main container always covers the full viewport */
+        #hero-container {
+            height: 100vh;
+            width: 100vw;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            /* Placeholder URL - REPLACE THIS with your GitHub image URL */
+            background-image: url('assets/Act_2_banner.jpg');
+        }
+    </style>
 </head>
 <body>
-<div id="app" aria-live="polite">
-  <div class="back-btn" id="backBtn">⟵ Back</div>
-  <div class="password-panel" id="passwordPanel" aria-hidden="true">
-    <div style="font-weight:600; margin-bottom:8px;">Enter Password</div>
-    <div>
-      <input id="pwdInput" type="password" placeholder="Password" aria-label="Password input">
-      <button id="pwdSubmit">Submit</button>
+
+    <!--
+        MAIN CONTAINER:
+        1. h-screen w-screen ensures it fills the entire viewport.
+        2. flex flex-col items-center justify-end pushes content to the bottom center.
+        3. The background image is set in the <style> block above for easier replacement.
+    -->
+    <div id="hero-container" class="relative flex flex-col items-center justify-end p-8">
+
+        <!--
+            OVERLAY:
+            Adds a subtle, dark gradient to the bottom to make the links visible against a busy image.
+        -->
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+
+        <!-- SOCIAL LINKS CONTAINER -->
+        <div class="z-10 flex space-x-6 mb-8">
+            
+            <!--
+                SOCIAL LINK 1: DISCORD
+                - Corrected to use the standard Discord SVG icon.
+                - Note: Update the href="#" with your actual Discord invite link.
+            -->
+            <a href="https://discord.gg/monalotls" target="_blank"
+               class="p-3 bg-white/20 backdrop-blur-sm rounded-full shadow-lg hover:scale-105 transition duration-300 text-white border-2 border-white/50 group"
+               aria-label="Link to Discord">
+               <!-- CORRECT Discord SVG Icon -->
+               <svg class="w-6 h-6 group-hover:text-indigo-400 transition duration-300" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M19.78 3.51c-.69-.42-1.41-.67-2.17-.79-2.73-.44-5.46-.44-8.19 0-.76.12-1.48.37-2.17.79-2.07 1.26-3.72 3.12-4.52 5.34-.17.47-.19.96-.12 1.45.16.89.59 1.7.99 2.45.39.75.83 1.47 1.25 2.19.42.72.84 1.42 1.26 2.11.41.69.83 1.37 1.25 2.05.35.58.75 1.15 1.17 1.7.5.64 1.05 1.25 1.6 1.8.3.31.62.61.94.88.58.5 1.21.93 1.86 1.27.3.16.63.29.98.38.35.09.7.13 1.05.13.35 0 .7-.04 1.05-.13.35-.09.68-.22.98-.38.65-.34 1.28-.77 1.86-1.27.32-.27.64-.57.94-.88.55-.55 1.1-1.16 1.6-1.8.42-.68.84-1.36 1.25-2.05.42-.72.86-1.44 1.25-2.19.4-.75.83-1.56.99-2.45.07-.49.05-.98-.12-1.45-.8-2.22-2.45-4.08-4.52-5.34zm-9.35 11.23c-1.12 0-2.03-.9-2.03-2.02s.91-2.02 2.03-2.02 2.03.9 2.03 2.02-.91 2.02-2.03 2.02zm4.6 0c-1.12 0-2.03-.9-2.03-2.02s.91-2.02 2.03-2.02 2.03.9 2.03 2.02-.91 2.02-2.03 2.02z"/>
+               </svg>
+            </a>
+
+            <!--
+                SOCIAL LINK 2: X (Twitter)
+                - X (Twitter) SVG icon remains correct.
+                - Note: Update the href="#" with your actual X profile link.
+            -->
+            <a href="https://x.com/Monalotls" target="_blank"
+               class="p-3 bg-white/20 backdrop-blur-sm rounded-full shadow-lg hover:scale-105 transition duration-300 text-white border-2 border-white/50 group"
+               aria-label="Link to X (Twitter)">
+               <!-- X (Twitter) SVG Icon -->
+               <svg class="w-6 h-6 group-hover:text-indigo-400 transition duration-300" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M18.901 1.956h3.41L15.65 10.966 24 22.042h-7.14L10.59 13.91 3.55 22.042H.14L7.844 12.87.031 1.956h7.52L12.44 8.653l4.64-6.697h1.821zm-2.022 17.585h2.324L6.96 4.34H4.596l12.283 15.196z"/>
+               </svg>
+            </a>
+        </div>
+
     </div>
-    <div class="message" id="pwdMessage"></div>
-  </div>
-  <div id="tempOverlay" class="click-anywhere" style="display:none"></div>
-  <div class="dev-note" id="devNote" style="display:none">DEV MODE: clickable overlays visible if toggled in code.</div>
 
-  <!-- Hotspots -->
-  <div id="s1a1" class="hotspot" style="left:15%; top:80%; width:10%; height:15%;"></div>
-  <div id="s1a2" class="hotspot" style="left:85%; top:35%; width:10%; height:15%;"></div>
-  <div id="s1a3" class="hotspot" style="left:30%; top:35%; width:15%; height:20%;"></div>
-  <div id="s2a1" class="hotspot" style="left:8%; top:70%; width:15%; height:15%; display:none;"></div>
-  <div id="s2a2" class="hotspot" style="left:85%; top:75%; width:10%; height:15%; display:none;"></div>
-  <div id="s2a3" class="hotspot" style="left:40%; top:70%; width:12%; height:25%; display:none;"></div>
-  <div id="s2a4" class="hotspot" style="left:35%; top:45%; width:23%; height:15%; display:none;"></div>
-  <div id="s3a1" class="hotspot" style="left:61%; top:67%; width:10%; height:12%; display:none;"></div>
-  <div id="s3a2" class="hotspot" style="left:45%; top:75%; width:15%; height:15%; display:none;"></div>
-  <div id="s3a3" class="hotspot" style="left:53%; top:20%; width:13%; height:28%; display:none; opacity:0.0;"></div>
-  <div id="s3sub1" class="hotspot" style="left:27%; top:12%; width:20%; height:15%; display:none;"></div>
-  <div id="s3sub2" class="hotspot" style="left:47%; top:75%; width:20%; height:20%; display:none;"></div>
-  <div id="s3sub3" class="hotspot" style="left:67%; top:55%; width:10%; height:15%; display:none;"></div>
-  <div id="s4a1" class="hotspot" style="left:60%; top:60%; width:17%; height:14%; display:none;"></div>
-</div>
-
-<!-- Audio -->
-<audio id="bgMusic" src="assets/bg_music.mp3" loop></audio>
-<audio id="s1a1Sound" src="assets/frog.mp3" preload="auto"></audio>
-<audio id="s1a2Sound" src="assets/bird.mp3" preload="auto"></audio>
-<audio id="s1a3Sound" src="assets/open.mp3" preload="auto"></audio>
-<audio id="s2a1Sound" src="assets/stone.mp3" preload="auto"></audio>
-<audio id="s2a2Sound" src="assets/drawer.mp3" preload="auto"></audio>
-<audio id="s2a3Sound" src="assets/open.mp3" preload="auto"></audio>
-<audio id="s2a4Sound" src="assets/open.mp3" preload="auto"></audio>
-<audio id="s3a1Sound" src="assets/paper.mp3" preload="auto"></audio>
-<audio id="s3a2Sound" src="assets/open.mp3" preload="auto"></audio>
-<audio id="s3a3Sound" src="assets/paper.mp3" preload="auto"></audio>
-<audio id="s3sub1Sound" src="assets/eating.mp3" preload="auto"></audio>
-<audio id="s3sub2Sound" src="assets/eating.mp3" preload="auto"></audio>
-<audio id="s3sub3Sound" src="assets/eating.mp3" preload="auto"></audio>
-<audio id="s4a1Sound" src="assets/open.mp3" preload="auto"></audio>
-
-<script>
-(() => {
-  // --- Backgrounds ---
-  const backgrounds = {
-    scene1: "url('assets/first_scene.jpg') center/cover no-repeat",
-    scene1_a1: "url('assets/mrog_scene.jpg') center/cover no-repeat",
-    scene1_a2: "url('assets/bird_scene.jpg') center/cover no-repeat",
-    scene2: "url('assets/second_scene.png') center/cover no-repeat",
-    scene2_a1: "url('assets/stone_scene.png') center/cover no-repeat",
-    scene2_a2: "url('assets/table_scene.jpg') center/cover no-repeat",
-    scene2_pass: "url('assets/door_scene1.png') center/cover no-repeat",
-    scene3: "url('assets/closed_scene.jpg') center/cover no-repeat",
-    scene3_c2: "url('assets/plate_scene.jpg') center/cover no-repeat",
-    scene3_afterC2: "url('assets/third_scene.jpg') center/cover no-repeat",
-    scene3_a1: "url('assets/scroll_scene.jpg') center/cover no-repeat",
-    scene4: "url('assets/book_scene.jpg') center/cover no-repeat"
-  };
-
-  const password = 'timeless';
-
-  // --- State ---
-  let state = { scene:1, tempActive:null, subC2Clicked:{s3sub1:false,s3sub2:false,s3sub3:false}, scene3Unlocked:false };
-
-  const app = document.getElementById('app');
-  const tempOverlay = document.getElementById('tempOverlay');
-  const passwordPanel = document.getElementById('passwordPanel');
-  const pwdInput = document.getElementById('pwdInput');
-  const pwdSubmit = document.getElementById('pwdSubmit');
-  const pwdMessage = document.getElementById('pwdMessage');
-  const backBtn = document.getElementById('backBtn');
-
-  // --- Audio elements ---
-const bgMusic = document.getElementById('bgMusic'); 
-const sounds = {
-  s1a1: document.getElementById('s1a1Sound'),
-  s1a2: document.getElementById('s1a2Sound'),
-  s1a3: document.getElementById('s1a3Sound'),
-  s2a1: document.getElementById('s2a1Sound'),
-  s2a2: document.getElementById('s2a2Sound'),
-  s2a3: document.getElementById('s2a3Sound'),
-  s2a4: document.getElementById('s2a4Sound'),
-  s3a1: document.getElementById('s3a1Sound'),
-  s3a2: document.getElementById('s3a2Sound'),
-  s3a3: document.getElementById('s3a3Sound'),
-  s3sub1: document.getElementById('s3sub1Sound'),
-  s3sub2: document.getElementById('s3sub2Sound'),
-  s3sub3: document.getElementById('s3sub3Sound'),
-  s4a1: document.getElementById('s4a1Sound')
-};
-  bgMusic.volume = 0.05;  // very quiet background music
-  Object.values(sounds).forEach(s => s.volume = 0.25); // slightly louder effects
-
-  function setBackground(key){ app.style.background = backgrounds[key] || key || '#222'; }
-  function showHotspots(ids){ document.querySelectorAll('.hotspot').forEach(h=>h.style.display='none'); ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='block'; }); }
-
-  // --- Scenes ---
-  function enterScene1(){ state.scene=1; state.tempActive=null; setBackground('scene1'); showHotspots(['s1a1','s1a2','s1a3']); hidePasswordPanel(); hideBackButton(); }
-  function s1a1Action(){ playSound('s1a1'); openTemp('scene1_a1',1); }
-  function s1a2Action(){ playSound('s1a2'); openTemp('scene1_a2',1); }
-  function s1a3Action(){ playSound('s1a3'); enterScene2(); }
-
-  function enterScene2(){ state.scene=2; setBackground('scene2'); showHotspots(['s2a1','s2a2','s2a3','s2a4']); hidePasswordPanel(); hideBackButton(); }
-  function s2a1Action(){ playSound('s2a1'); openTemp('scene2_a1',2); }
-  function s2a2Action(){ playSound('s2a2'); openTemp('scene2_a2',2); }
-  function s2a3Action(){ playSound('s2a3'); enterScene1(); }
-  function s2a4Action(){ playSound('s2a4'); state.scene = '2_pass'; showPasswordScreen(); }
-
-  function showPasswordScreen(){ setBackground('scene2_pass'); showPasswordPanel(); showBackButton(); showHotspots([]); }
-  function showPasswordPanel(){ passwordPanel.style.display='block'; passwordPanel.setAttribute('aria-hidden','false'); pwdMessage.textContent=''; pwdInput.value=''; pwdInput.focus();}
-  function hidePasswordPanel(){ passwordPanel.style.display='none'; passwordPanel.setAttribute('aria-hidden','true'); }
-
-  pwdSubmit.addEventListener('click',()=>{
-    if(pwdInput.value.trim()===password){ pwdMessage.style.color='#bdf7c6'; pwdMessage.textContent='Unlocked!'; hidePasswordPanel(); hideBackButton(); enterScene3(); } 
-    else { pwdMessage.style.color='#4b2e0f'; pwdMessage.textContent='Incorrect password.'; }
-  });
-  pwdInput.addEventListener('keypress',e=>{ if(e.key==='Enter'){pwdSubmit.click();} });
-
-  function enterScene3(){ state.scene=3; setBackground(state.scene3Unlocked?'scene3_afterC2':'scene3'); showHotspots(['s3a1','s3a2'].concat(state.scene3Unlocked?['s3a3']:[])); hidePasswordPanel(); hideBackButton(); }
-  function s3a1Action(){ playSound('s3a1'); openTemp('scene3_a1',3); }
-  function s3a2Action(){ playSound('s3a2'); enterSubC2(); }
-  function s3a3Action(){ if(state.scene3Unlocked){ playSound('s3a3'); enterScene4(); } }
-
-  function enterSubC2(){ state.scene=3.2; setBackground('scene3_c2'); showHotspots(['s3sub1','s3sub2','s3sub3']); showBackButton(); state.subC2Clicked={s3sub1:false,s3sub2:false,s3sub3:false}; }
-  function handleSubClick(id){ playSound(id); state.subC2Clicked[id]=true; document.getElementById(id).style.display='none'; flash(); if(state.subC2Clicked.s3sub1 && state.subC2Clicked.s3sub2 && state.subC2Clicked.s3sub3){ state.scene3Unlocked=true; enterScene3(); } }
-
-  function enterScene4(){ state.scene=4; setBackground('scene4'); showHotspots(['s4a1']); hideBackButton(); }
-  function s4a1Action(){ playSound('s4a1'); window.open('https://docs.google.com/forms/d/e/1FAIpQLScC6asogSAyfWz5jQbuOZuWM2QVhCg1lNtt-YERSxLf5HSVnQ/viewform?usp=dialog','_blank','noopener'); }
-
-  function openTemp(bg,originScene){ state.tempActive={originScene}; setBackground(bg); showHotspots([]); tempOverlay.style.display='block'; tempOverlay.onclick=()=>{ tempOverlay.style.display='none'; state.tempActive=null; if(originScene===1) enterScene1(); else if(originScene===2) enterScene2(); else enterScene3(); }; }
-  function showBackButton(){ backBtn.style.display='block'; } function hideBackButton(){ backBtn.style.display='none'; }
-
-  backBtn.addEventListener('click', ()=>{
-    if(state.scene === 3.2){ enterScene3(); }
-    else if(state.scene === '2_pass'){ enterScene2(); }
-    else if(state.scene === 2 || state.scene === 1){ enterScene2(); }
-    else { enterScene2(); }
-  });
-
-  function flash(){ app.style.transition='none'; app.style.filter='brightness(1.1)'; setTimeout(()=>{app.style.transition='filter 220ms ease'; app.style.filter='brightness(1)';},60); }
-
-  function playSound(id){ if(sounds[id]){ sounds[id].currentTime=0; sounds[id].play().catch(()=>{}); } }
-
-  const hookup = {
-    s1a1:s1a1Action,s1a2:s1a2Action,s1a3:s1a3Action,
-    s2a1:s2a1Action,s2a2:s2a2Action,s2a3:s2a3Action,s2a4:s2a4Action,
-    s3a1:s3a1Action,s3a2:s3a2Action,s3a3:s3a3Action,
-    s3sub1:()=>handleSubClick('s3sub1'),
-    s3sub2:()=>handleSubClick('s3sub2'),
-    s3sub3:()=>handleSubClick('s3sub3'),
-    s4a1:s4a1Action
-  };
-  Object.keys(hookup).forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); hookup[id](); }); });
-
-  window.addEventListener('keydown', (e) => { if(e.key==='d' && e.ctrlKey){ const dev = document.getElementById('devNote'); const all = document.querySelectorAll('.hotspot'); if(dev.style.display==='none'){ dev.style.display='block'; all.forEach(h=>h.style.border='1px dashed rgba(255,255,255,0.25)'); } else { dev.style.display='none'; all.forEach(h=>h.style.border='0'); } } });
-  
-  function startMusic(){ 
-  bgMusic.volume = 0.05; 
-  bgMusic.play().catch(err=>{ console.log('Music autoplay blocked until user interacts.'); }); window.removeEventListener('click', startMusic); }
-  window.addEventListener('click', startMusic);
-
-  enterScene1();
-  document.querySelectorAll('.hotspot').forEach(el => el.removeAttribute('title'));
-})();
-</script>
 </body>
 </html>
